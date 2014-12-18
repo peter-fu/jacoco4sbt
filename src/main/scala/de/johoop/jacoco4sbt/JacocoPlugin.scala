@@ -31,7 +31,7 @@ object JacocoPlugin extends Plugin {
 
       excludes := Seq(),
 
-      coveredSources := (sourceDirectories in Compile).value,
+      coveredSources := (sourceDirectories.all(ScopeFilter(inAnyProject, inConfigurations(Compile)))).value.flatten,
 
       instrumentedClassDirectory := outputDirectory.value / (classDirectory in Compile).value.getName,
 
@@ -40,6 +40,10 @@ object JacocoPlugin extends Plugin {
 
       clean <<= outputDirectory map (dir => if (dir.exists) IO delete dir.listFiles)
     )
+  }
+
+  private def filterClassesToCoverForSeq(classDirectories: Seq[java.io.File], incl: Seq[String], excl: Seq[String]) = {
+    classDirectories.foldLeft(Seq[File]())(_ ++ filterClassesToCover(_, incl, excl))
   }
 
   private def filterClassesToCover(classes: File, incl: Seq[String], excl: Seq[String]) = {
@@ -79,9 +83,11 @@ object JacocoPlugin extends Plugin {
       libraryDependencies +=
         "org.jacoco" % "org.jacoco.agent" % "0.7.1.201405082137" % "jacoco" artifacts(Artifact("org.jacoco.agent", "jar", "jar"))
     ) ++ inConfig(Config)(Defaults.testSettings ++ JacocoDefaults.settings ++ Seq(
-      classesToCover <<= (classDirectory in Compile, includes, excludes) map filterClassesToCover,
+      classDirectoriesAll := (classDirectory.all(ScopeFilter(inAnyProject, inConfigurations(Compile)))).value,
+      classesToCover <<= (classDirectoriesAll, includes, excludes) map filterClassesToCoverForSeq,
 
-      fullClasspath <<= (products in Compile, fullClasspath in srcConfig, instrumentedClassDirectory, update, fork, streams) map instrumentAction,
+      productsAll := (products.all(ScopeFilter(inAnyProject, inConfigurations(Compile)))).value.flatten,
+      fullClasspath <<= (productsAll, fullClasspath in srcConfig, instrumentedClassDirectory, update, fork, streams) map instrumentAction,
       javaOptions <++= (fork, outputDirectory) map { (forked, out) =>
         if (forked) Seq(s"-Djacoco-agent.destfile=${out / "jacoco.exec" absolutePath}") else Seq()
       },

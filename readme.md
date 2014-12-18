@@ -1,3 +1,7 @@
+# Customization
+
+For a SBT project with sub projects, when testing the main project, jacoco4sbt will also generate coverage report for the classes in sub projects, just like it's one huge project.
+
 # jacoco4sbt - Code Coverage via JaCoCo in sbt
 
 This is an [sbt](http://scala-sbt.org/) and [Typesafe Activator](https://typesafe.com/activator) plugin for code coverage analysis via [JaCoCo](http://www.eclemma.org/jacoco/).

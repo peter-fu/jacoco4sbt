@@ -24,6 +24,9 @@ trait Keys {
   lazy val sourceTabWidth = SettingKey[Int]("source-tab-width", "Tab width of the sources to display in the JaCoCo reports.")
   lazy val sourceEncoding = SettingKey[String]("source-encoding", "Encoding of the source files (for JaCoCo reporting).")
 
+  lazy val classDirectoriesAll = TaskKey[Seq[File]]("", "")
+  lazy val productsAll = TaskKey[Seq[File]]("", "")
+
   lazy val coveredSources = TaskKey[Seq[File]]("covered-sources", "Covered Sources.")
   lazy val classesToCover = TaskKey[Seq[File]]("classes-to-cover", "compiled classes (filtered by includes and excludes) that will be covered")
   

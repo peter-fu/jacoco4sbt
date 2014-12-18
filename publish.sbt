@@ -1,9 +1,9 @@
 publishTo := {
-  val r = if (isSnapshot.value) Resolver.sbtPluginRepo("snapshots")
-          else Resolver.sbtPluginRepo("releases")
-  Some(r)
+  val nexus = "http://115.28.15.44:8080/nexus/"
+  if (version.value.trim.endsWith("SNAPSHOT"))
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases"  at nexus + "content/repositories/releases")
 }
 
-publishMavenStyle := false
-
-publishArtifact in Test := false
+credentials += Credentials(Path.userHome / ".sbt" / "repo.kernelogic.credentials")
